@@ -3,6 +3,17 @@
 
 require __DIR__ . '/services.php';
 
+if(!isset($argv[5])) {
+	echo 'Arguments from shell not found.' . PHP_EOL;
+	echo './run-selenium.php [1] [2] [3] [4] [5]' . PHP_EOL;
+	echo '[1] = Where to discover tests' . PHP_EOL;
+	echo '[2] = Where to leave jUnit XML results' . PHP_EOL;
+	echo '[3] = The host to run the tests against' . PHP_EOL;
+	echo '[4] = The hostname for Selenium RC' . PHP_EOL;
+	echo '[5] = The port number for Selenium RC' . PHP_EOL;
+	exit;
+}
+
 // Load arguments from the shell.
 $tests_directory   = $argv[1]; // Where to discover tests
 $results_directory = $argv[2]; // Where to leave jUnit XML results
