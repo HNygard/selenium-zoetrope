@@ -4,56 +4,74 @@
  * Generic class for just-in-time daemonized services.
  */
 abstract class BackgroundService {
-  protected $pid_file_name;
-  protected $output_file_name;
-
-  protected function startProcess($command) {
-    echo 'Starting background service: ' . $command . PHP_EOL;
-
-    // Store the output of the background service and it's pid in temporary
-    // files in the system tmp directory.
-    $directory = sys_get_temp_dir() . '/background-services';
-    @mkdir($directory);
-    $unique_file = tempnam($directory, 'background-service-');
-    $this->pid_file_name =  $unique_file . '.pid';
-    $this->output_file_name = $unique_file . '.out';
-    unlink($unique_file);
-    exec(sprintf("%s > %s 2>&1 & echo $! > %s", $command, $this->output_file_name, $this->pid_file_name));
-
-    $remaining_tries = 60;
-    while ($remaining_tries > 0 && !$this->isReady()) {
-      sleep(2);
-      --$remaining_tries;
-    }
-
-    if ($remaining_tries == 0) {
-      echo 'Background service failed:' . PHP_EOL;
-      echo $this->getOutput();
-      throw new Exception('Background service did not start.');
-    }
-  }
-
-  protected function isReady() {
-    return TRUE;
-  }
-
-  public function getOutput() {
-    return file_get_contents($this->output_file_name);
-  }
-
-  public function getPid() {
-    return isset($this->pid_file_name) ? file_get_contents($this->pid_file_name) : NULL;
-  }
-
-  public function __destruct() {
-    $pid = $this->getPid();
-    if (isset($pid)) {
-      echo 'Killing background service ' . $this->output_file_name . PHP_EOL;
-      exec('kill ' . $pid);
-      unlink($this->pid_file_name);
-    }
-    unlink($this->output_file_name);
-  }
+	protected $pid_file_name;
+	protected $output_file_name;
+	
+	protected function startProcess($command) {
+		global $selenium_host;
+		echo 'Starting background service @ '.$selenium_host.': '.PHP_EOL.
+			'    ' . $command . PHP_EOL;
+		
+		// Store the output of the background service and it's pid in temporary
+		// files in the system tmp directory.
+		//$directory = sys_get_temp_dir() . '/background-services';
+		//@mkdir($directory);
+		//$unique_file = tempnam($directory, 'background-service-');
+		//$this->pid_file_name =  $unique_file . '.pid';
+		//$this->output_file_name = $unique_file . '.out';
+		//unlink($unique_file);
+		
+		$this->pid_file_name = 'background-service-'.time().'.pid';
+		$this->output_file_name = 'background-service-'.time().'.out';
+		$command = sprintf("%s > %s 2>&1 & echo $! > %s", $command, $this->output_file_name, $this->pid_file_name);
+		exec('ssh '.$selenium_host.' \''.$command.' &\'');
+		
+		$remaining_tries = 60;
+		while ($remaining_tries > 0 && !$this->isReady()) {
+			sleep(2);
+			--$remaining_tries;
+		}
+		
+		if ($remaining_tries == 0) {
+			echo 'Background service failed:' . PHP_EOL;
+			echo $this->getOutput();
+			throw new Exception('Background service did not start.');
+		}
+	}
+	
+	protected function isReady() {
+		return TRUE;
+	}
+	
+	public function getOutput() {
+		global $selenium_host;
+		exec('ssh '.$selenium_host.' \'cat '.$this->output_file_name.'\'', $output);
+		return implode($output, PHP_EOL);
+	}
+	
+	public function getPid() {
+		global $selenium_host;
+		if(isset($this->pid_file_name)) {
+			exec('ssh '.$selenium_host.' \'cat '.$this->pid_file_name.'\'', $pid);
+			return $pid[0];
+		}
+		else {
+			return NULL;
+		}
+	}
+	
+	public function __destruct() {
+		global $selenium_host;
+		$pid = $this->getPid();
+		if (isset($pid)) {
+			echo 'Killing background service ' . $pid . PHP_EOL;
+			exec('ssh '.$selenium_host.' \'kill ' . $pid .'\'');
+			exec('ssh '.$selenium_host.' \'rm '.$this->pid_file_name.'\'');
+		}
+		echo PHP_EOL.'########## Flushing log ##########'.PHP_EOL;
+		echo $this->getOutput().PHP_EOL.PHP_EOL;
+		exec('ssh '.$selenium_host.' \'rm '.$this->output_file_name.'\'');
+	}
 }
 
 /**
@@ -112,14 +130,15 @@ class SeleniumBackgroundService extends BackgroundService implements SeleniumSer
   public function __construct(XWindowsServiceInterface $display, $port) {
     $this->port = $port;
 
-    $command = 'DISPLAY="' . $display->getDisplay() . '" && java -jar ~/selenium-server-*/selenium-server.jar -port ' . $this->port;
+    $command = 'export DISPLAY=localhost:'.$this->port.'.0; java -debug -jar ~/selenium-server-standalone-2.4.0.jar -port ' . $this->port;
 
     $this->startProcess($command);
   }
 
-  public function getHost() {
-    return '127.0.0.1';
-  }
+	public function getHost() {
+		global $selenium_host;
+		return $selenium_host;
+	}
 
   public function getPort() {
     return $this->port;

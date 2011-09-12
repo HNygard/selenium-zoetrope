@@ -63,31 +63,32 @@ else {
 // Run tests.
 $tests = selenium_get_all_tests($tests_directory, $selenium, $base_url);
 if (!empty($tests)) {
-  foreach ($tests as $test) {
-    echo PHP_EOL;
-    echo '####################################################################' . PHP_EOL;
-    echo '## Running test: ' . $test->getTestClassName() . PHP_EOL;
-    echo '####################################################################' . PHP_EOL;
+	foreach ($tests as $test) {
+		echo PHP_EOL;
+		echo '####################################################################' . PHP_EOL;
+		echo '## Running test: ' . $test->getTestClassName() . PHP_EOL;
+		echo '####################################################################' . PHP_EOL;
 
-    $junit_file = $results_directory . '/' . $test->getTestClassName() . '.xml';
+		$junit_file = $results_directory . '/' . $test->getTestClassName() . '.xml';
 
-    // Record a screencast if there's a valid X buffer.
-    if (isset($xvfb)) {
-      $screencast_file = $results_directory . '/' . $test->getTestClassName() . '.mp4';
-      $screencast = new ScreencastBackgroundService($xvfb, $screencast_file);
-    }
+		// Record a screencast if there's a valid X buffer.
+		if (isset($xvfb)) {
+			//$screencast_file = $results_directory . '/' . $test->getTestClassName() . '.mp4';
+			$screencast_file = $test->getTestClassName() . '.mp4';
+			$screencast = new ScreencastBackgroundService($xvfb, $screencast_file);
+		}
 
-    // Run the test and store the output.
-    $test->run($junit_file);
+		// Run the test and store the output.
+		$test->run($junit_file);
 
-    // Stop the screencast if one is active.
-    if (isset($screencast)) {
-      unset($screencast);
-    }
+		// Stop the screencast if one is active.
+		if (isset($screencast)) {
+			unset($screencast);
+		}
 
-    // Unload the test.
-    unset($test);
-  }
+		// Unload the test.
+		unset($test);
+	}
 }
 else {
   echo 'No tests found.' . PHP_EOL;
