@@ -25,10 +25,12 @@ OK (1 test, 0 assertions)
 
 class SeleniumTestTest extends PHPUnit_Extensions_SeleniumTestCase {
 	protected function setUp() {
-		$this->setBrowser ( '*firefox' );
-		$this->setHost ('seleniumserver1.dev.recondo.no');
-		$this->setPort (4444);
-		$this->setBrowserUrl ( 'http://en.wikipedia.org/');
+		global $selenium_server_host, $selenium_server_port, $target_browser, $target_url;
+		
+		$this->setBrowser ( $target_browser );
+		$this->setHost ($selenium_server_host);
+		$this->setPort ($selenium_server_port);
+		$this->setBrowserUrl ( $target_url );
 	}
 	
 	public function testCanOpenMainPage() {
