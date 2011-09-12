@@ -1,6 +1,23 @@
 #!/usr/bin/php -q
 <?php
 
+/*
+
+Make executable:
+chmod +x run-selenium.php
+
+Install stuff:
+sudo apt-get install php5-curl
+
+Look at arguments:
+./run-selenium.php
+
+Run against Google:
+./run-selenium.php ./tests/ ./junit-reports/ http://www.google.com/ selenium.server.com 4444
+
+*/
+
+
 require __DIR__ . '/services.php';
 
 if(!isset($argv[5])) {

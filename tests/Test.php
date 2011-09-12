@@ -26,7 +26,7 @@ OK (1 test, 0 assertions)
 class SeleniumTestTest extends PHPUnit_Extensions_SeleniumTestCase {
 	protected function setUp() {
 		$this->setBrowser ( '*firefox' );
-		$this->setHost ('someselenium.server.com');
+		$this->setHost ('seleniumserver1.dev.recondo.no');
 		$this->setPort (4444);
 		$this->setBrowserUrl ( 'http://en.wikipedia.org/');
 	}
