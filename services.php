@@ -21,8 +21,9 @@ abstract class BackgroundService {
 		//$this->output_file_name = $unique_file . '.out';
 		//unlink($unique_file);
 		
-		$this->pid_file_name = 'background-service-'.time().'.pid';
-		$this->output_file_name = 'background-service-'.time().'.out';
+		$unique = time().rand(0,100);
+		$this->pid_file_name = 'background-service-'.$unique.'.pid';
+		$this->output_file_name = 'background-service-'.$unique.'.out';
 		$command = sprintf("%s > %s 2>&1 & echo $! > %s", $command, $this->output_file_name, $this->pid_file_name);
 		exec('ssh '.$selenium_host.' \''.$command.' &\'');
 		
