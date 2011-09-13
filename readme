@@ -1,0 +1,3 @@
+Found on https://launchpad.net/selenium-zoetrope under GNU LGPL v3
+
+Extended with support for running the whole thing over SSH on a remote machine.
