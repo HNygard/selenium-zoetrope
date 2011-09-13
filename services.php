@@ -130,7 +130,7 @@ class SeleniumBackgroundService extends BackgroundService implements SeleniumSer
 	public function __construct(XWindowsServiceInterface $display, $port) {
 		$this->port = $port;
 
-		$command = 'export DISPLAY=localhost:'.$this->port.'.0; java -debug -jar ~/selenium-server-standalone-2.4.0.jar -port ' . $this->port;
+		$command = 'export DISPLAY=localhost:'.$this->port.'.0; java -jar ~/selenium-server-standalone-2.4.0.jar -port ' . $this->port;
 
 		$this->startProcess($command);
 	}
