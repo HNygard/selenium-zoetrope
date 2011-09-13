@@ -10,7 +10,7 @@ abstract class BackgroundService {
 	protected function startProcess($command) {
 		global $selenium_host;
 		echo 'Starting background service @ '.$selenium_host.': '.PHP_EOL.
-			'    ' . $command . PHP_EOL;
+			'    ' . $command . PHP_EOL . PHP_EOL;
 		
 		// Store the output of the background service and it's pid in temporary
 		// files in the system tmp directory.
