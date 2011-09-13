@@ -18,13 +18,13 @@ Run against Google:
 require __DIR__ . '/services.php';
 
 if(!isset($argv[5])) {
-	echo 'Arguments from shell not found.' . PHP_EOL;
-	echo './run-selenium.php [1] [2] [3] [4] [5]' . PHP_EOL;
-	echo '[1] = Where to discover tests' . PHP_EOL;
-	echo '[2] = Where to leave jUnit XML results' . PHP_EOL;
-	echo '[3] = The host to run the tests against' . PHP_EOL;
-	echo '[4] = The hostname for Selenium RC' . PHP_EOL;
-	echo '[5] = The port number for Selenium RC' . PHP_EOL;
+	echo 'Arguments from shell not found.'          . PHP_EOL;
+	echo './run-selenium.php [1] [2] [3] [4] [5]'   . PHP_EOL;
+	echo '[1] = Where to discover tests'            . PHP_EOL;
+	echo '[2] = Where to leave jUnit XML results'   . PHP_EOL;
+	echo '[3] = The host to run the tests against'  . PHP_EOL;
+	echo '[4] = The hostname for Selenium RC'       . PHP_EOL;
+	echo '[5] = The port number for Selenium RC'    . PHP_EOL;
 	exit;
 }
 
@@ -46,15 +46,15 @@ $selenium_is_running = selenium_is_running($selenium_host, $selenium_port);
 $xvfb = NULL;
 $selenium = NULL;
 if ($selenium_is_running) {
-  echo 'Selenium is already running. Using the existing service.' . PHP_EOL;
-  $selenium = new SeleniumExternalService($selenium_host, $selenium_port);
+	echo 'Selenium is already running. Using the existing service.' . PHP_EOL;
+	$selenium = new SeleniumExternalService($selenium_host, $selenium_port);
 }
 else {
-  echo 'Selenium is not running. Starting a new, local service.' . PHP_EOL;
-  // Use the Selenium port for the X display number, too.
-  $x_display_number = $selenium_port;
-  $xvfb = new XvfbBackgroundService($x_display_number, 1200, 2000);
-  $selenium = new SeleniumBackgroundService($xvfb, $selenium_port);
+	echo 'Selenium is not running. Starting a new, local service.' . PHP_EOL;
+	// Use the Selenium port for the X display number, too.
+	$x_display_number = $selenium_port;
+	$xvfb = new XvfbBackgroundService($x_display_number, 1200, 2000);
+	$selenium = new SeleniumBackgroundService($xvfb, $selenium_port);
 }
 
 // Run tests.
@@ -63,7 +63,7 @@ if (!empty($tests)) {
 	foreach ($tests as $test) {
 		echo PHP_EOL;
 		echo '####################################################################' . PHP_EOL;
-		echo '## Running test: ' . $test->getTestClassName() . PHP_EOL;
+		echo '## Running test: ' . $test->getTestClassName()                        . PHP_EOL;
 		echo '####################################################################' . PHP_EOL;
 
 		$junit_file = $results_directory . '/' . $test->getTestClassName() . '.xml';
@@ -88,5 +88,5 @@ if (!empty($tests)) {
 	}
 }
 else {
-  echo 'No tests found.' . PHP_EOL;
+	echo 'No tests found.' . PHP_EOL;
 }
