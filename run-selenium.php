@@ -6,9 +6,6 @@
 Make executable:
 chmod +x run-selenium.php
 
-Install stuff:
-sudo apt-get install php5-curl
-
 Look at arguments:
 ./run-selenium.php
 
