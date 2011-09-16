@@ -35,6 +35,11 @@ $base_url          = $argv[3]; // The host to run the tests against
 $selenium_host     = $argv[4]; // The hostname for Selenium RC
 $selenium_port     = $argv[5]; // The port number for Selenium RC
 
+
+// System settings
+$running_ssh = true;
+
+
 // Prepare a clean environment.
 
 // Ensure a clean destination for results exists.
