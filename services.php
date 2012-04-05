@@ -90,8 +90,8 @@ abstract class BackgroundService {
 			}
 			zoetrope_rm($this->pid_file_name);
 		}
-		echo PHP_EOL.'########## Flushing log ##########'.PHP_EOL;
-		echo $this->getOutput().PHP_EOL.PHP_EOL;
+		//echo PHP_EOL.'########## Flushing log ##########'.PHP_EOL;
+		//echo $this->getOutput().PHP_EOL.PHP_EOL;
 		zoetrope_rm($this->output_file_name);
 	}
 }
