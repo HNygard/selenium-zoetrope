@@ -264,7 +264,7 @@ class SeleniumTest {
 
 function selenium_get_all_tests($directory, SeleniumServiceInterface $selenium, $base_url) {
 	$tests = array();
-	$test_files = explode(PHP_EOL, trim(shell_exec('find ' . $directory . ' | grep Test.php$')));
+	$test_files = explode(PHP_EOL, trim(shell_exec('find ' . $directory . ' | grep php$')));
 	if (!empty($test_files) && !empty($test_files[0])) {
 		foreach ($test_files as $test_file) {
 			$tests[] = new SeleniumTest($selenium, $test_file, $base_url);
