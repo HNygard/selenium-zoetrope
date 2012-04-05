@@ -37,7 +37,7 @@ $selenium_port     = $argv[5]; // The port number for Selenium RC
 
 
 // System settings
-$running_ssh = true;
+$running_ssh = false;
 
 
 // Prepare a clean environment.
