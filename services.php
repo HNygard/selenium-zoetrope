@@ -262,6 +262,12 @@ class SeleniumTest {
 	}
 }
 
+/**
+ * @param                            $directory
+ * @param  SeleniumServiceInterface  $selenium
+ * @param                            $base_url
+ * @return SeleniumTest[]
+ */
 function selenium_get_all_tests($directory, SeleniumServiceInterface $selenium, $base_url) {
 	$tests = array();
 	$test_files = explode(PHP_EOL, trim(shell_exec('find ' . $directory . ' | grep php$')));
