@@ -71,7 +71,7 @@ if (!empty($tests)) {
 		echo '## Running test: ' . $test->getTestClassName()                        . PHP_EOL;
 		echo '####################################################################' . PHP_EOL;
 
-		$junit_file = $results_directory . '/' . $test->getTestClassName() . '.xml';
+		$junit_file = realpath($results_directory) . '/' . $test->getTestClassName() . '.xml';
 
 		// Record a screencast if there's a valid X buffer.
 		if (isset($xvfb)) {
