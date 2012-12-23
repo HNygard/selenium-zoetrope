@@ -9,11 +9,6 @@ abstract class BackgroundService {
 	
 	protected function startProcess($command) {
 		global $selenium_host, $running_ssh;
-		echo 'Starting background service @ '.$selenium_host.': '.PHP_EOL.
-			'    ' . $command . PHP_EOL ;
-        echo 'Output file: ' . $this->output_file_name . PHP_EOL;
-        echo PHP_EOL;
-		
 		// Store the output of the background service and it's pid in temporary
 		// files in the system tmp directory.
 		//$directory = sys_get_temp_dir() . '/background-services';
@@ -26,7 +21,13 @@ abstract class BackgroundService {
 		$unique = time().rand(0,100);
 		$this->pid_file_name = 'background-service-'.$unique.'.pid';
 		$this->output_file_name = 'background-service-'.$unique.'.out';
-		$command = sprintf("%s > %s 2>&1 & echo $! > %s", $command, $this->output_file_name, $this->pid_file_name);
+
+        echo 'Starting background service @ '.$selenium_host.': '.PHP_EOL.
+            '    ' . $command . PHP_EOL ;
+        echo 'Output file: ' . $this->output_file_name . PHP_EOL;
+        echo PHP_EOL;
+
+        $command = sprintf("%s > %s 2>&1 & echo $! > %s", $command, $this->output_file_name, $this->pid_file_name);
 		if($running_ssh) {
 			exec('ssh '.$selenium_host.' \''.$command.' &\'');
 		}
