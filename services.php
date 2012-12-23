@@ -231,6 +231,10 @@ class SeleniumTest {
 		$text .= '$selenium_server_port = ' . $selenium_server->getPort() . ';' . PHP_EOL;
 		$text .= '$target_browser = \'' . $browser . '\';' . PHP_EOL;
 		$text .= '$target_url = \'' . $base_url . '\';' . PHP_EOL;
+
+		$text .= '$screenshot = true;' . PHP_EOL;
+		$text .= '$screenshot_url = \'http://todo/\';' . PHP_EOL;
+		$text .= '$screenshot_path = \'' . __DIR__ . '/../build/selenium_screenshots/\';' . PHP_EOL;
 		
 		// Store a unique bootstrap file per test.
 		$directory = sys_get_temp_dir() . '/selenium-bootstrap';
