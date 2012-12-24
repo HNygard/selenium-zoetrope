@@ -17,24 +17,73 @@ Run against Google:
 
 require __DIR__ . '/services.php';
 
-if(!isset($argv[5])) {
-	echo 'Arguments from shell not found.'          . PHP_EOL;
-	echo './run-selenium.php [1] [2] [3] [4] [5]'   . PHP_EOL;
-	echo '[1] = Where to discover tests'            . PHP_EOL;
-	echo '[2] = Where to leave jUnit XML results'   . PHP_EOL;
-	echo '[3] = The host to run the tests against'  . PHP_EOL;
-	echo '[4] = The hostname for Selenium RC'       . PHP_EOL;
-	echo '[5] = The port number for Selenium RC'    . PHP_EOL;
-	exit;
+// Load arguments from the shell.
+$opts = array();
+$opts['h']  = '                       = Help (this page)';
+$opts['p:'] = ' [port]                = Selenium server port. "random" for random port number.';
+$opts['t:'] = ' [dir/file]            = Path to test directory(/file for single test). This is where tests are discovered.';
+$opts['r:'] = ' [dir]                 = Path to result directory (any files already in directory will be deleted!).';
+$opts['u:'] = ' [url]                 = URL to website (The website to run the tests against)';
+
+$longopts = array();
+$longopts ['host:'] = ' [ip/host]         = Selenium server hostname or ip';
+
+$opt_string = '';
+foreach($opts as $key => $option) {
+    $opt_string .= $key;
+}
+$longopts2 = array();
+foreach($longopts as $key => $option) {
+    $longopts2[] = $key;
+}
+$options = getopt($opt_string, $longopts2);
+
+// Set defaults
+$base_url          = null; // The default host to run the tests against
+$selenium_host     = '127.0.0.1';            // The default hostname for Selenium RC
+$selenium_port     = 4444;                   // The default port number for Selenium RC
+$tests_directory   = __DIR__ . '/tests';     // The default location of tests
+$results_directory = __DIR__ . '/results';   // The default location to put results directory
+
+// Override defaults with user input
+if(isset($options['h'])) {
+    foreach($opts as $key => $option) {
+        echo '-'.str_replace(':', '', $key).' '.$option.chr(10);
+    }
+    foreach($longopts as $key => $option) {
+        echo '--'.str_replace(':', '', $key).' '.$option.chr(10);
+    }
+    exit;
 }
 
-// Load arguments from the shell.
-$tests_directory   = $argv[1]; // Where to discover tests
-$results_directory = $argv[2]; // Where to leave jUnit XML results
-$base_url          = $argv[3]; // The host to run the tests against
-$selenium_host     = $argv[4]; // The hostname for Selenium RC
-$selenium_port     = $argv[5]; // The port number for Selenium RC
+if ( isset($options['u']) ) $base_url = $options['u'];
+if ( isset($options['host']) ) $selenium_host = $options['host'];
+if ( isset($options['p']) ) {
+    if ( $options['p'] == 'random' || $options['p'] == 'rnd' || $options['p'] == 'rand' )
+        $selenium_port = rand( 10000, 20000 );
+    else
+        $selenium_port = $options['p'];
+}
+if ( isset($options['t']) ) {
+    $tests_directory = $options['t'];
+    if ( strpos( $tests_directory, '/' ) === false ) $tests_directory = __DIR__ . '/' . $tests_directory;
+}
+if ( isset($options['r']) ) {
+    $results_directory = $options['r'];
+    if ( strpos( $results_directory, '/' ) === false ) $results_directory = __DIR__ . '/' . $results_directory;
+}
 
+echo "base_url:          $base_url".PHP_EOL;
+echo "selenium_host:     $selenium_host".PHP_EOL;
+echo "selenium_port:     $selenium_port".PHP_EOL;
+echo "tests_directory:   $tests_directory".PHP_EOL;
+echo "results_directory: $results_directory".PHP_EOL;
+
+
+if(is_null($base_url)) {
+    echo PHP_EOL.PHP_EOL.'Error: Missing base url'.PHP_EOL;
+    exit(1);
+}
 
 // System settings
 $running_ssh = false;
