@@ -239,7 +239,7 @@ class SeleniumTest {
 
 		$text .= '$screenshot = true;' . PHP_EOL;
 		$text .= '$screenshot_url = \'http://todo/\';' . PHP_EOL;
-		$text .= '$screenshot_path = \'' .realpath($results_directory.'/screenshot/').'\';' . PHP_EOL;
+		$text .= '$screenshot_path = \'' .realpath($results_directory.'/screenshots/').'\';' . PHP_EOL;
 
         // TODO: remove debug
         echo PHP_EOL.PHP_EOL.$text.PHP_EOL.PHP_EOL;

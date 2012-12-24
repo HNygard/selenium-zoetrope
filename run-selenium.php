@@ -75,6 +75,12 @@ if ( isset($options['r']) ) {
 
 $results_directory = realpath($results_directory);
 
+
+echo PHP_EOL;
+echo '####################################################################' . PHP_EOL;
+echo '## Running Selenium tests' . PHP_EOL;
+echo '####################################################################' . PHP_EOL;
+
 echo "base_url:          $base_url".PHP_EOL;
 echo "selenium_host:     $selenium_host".PHP_EOL;
 echo "selenium_port:     $selenium_port".PHP_EOL;
