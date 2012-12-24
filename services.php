@@ -221,6 +221,8 @@ class SeleniumTest {
 	protected $testFileName;
 	
 	public function __construct(SeleniumServiceInterface $selenium_server, $test_file, $base_url, $browser = '*firefox') {
+        global $results_directory;
+
 		$this->testFileName = $test_file;
 		$this->testClassName = pathinfo($test_file, PATHINFO_FILENAME);
 		
@@ -237,7 +239,10 @@ class SeleniumTest {
 
 		$text .= '$screenshot = true;' . PHP_EOL;
 		$text .= '$screenshot_url = \'http://todo/\';' . PHP_EOL;
-		$text .= '$screenshot_path = \'' . __DIR__ . '/../build/selenium_screenshots/\';' . PHP_EOL;
+		$text .= '$screenshot_path = \'' .realpath($results_directory.'/screenshot/').'\';' . PHP_EOL;
+
+        // TODO: remove debug
+        echo PHP_EOL.PHP_EOL.$text.PHP_EOL.PHP_EOL;
 		
 		// Store a unique bootstrap file per test.
 		$directory = sys_get_temp_dir() . '/selenium-bootstrap';

@@ -95,6 +95,10 @@ $running_ssh = false;
 exec('rm -rf ' . $results_directory);
 mkdir($results_directory);
 
+mkdir($results_directory.'/xml');
+mkdir($results_directory.'/video');
+mkdir($results_directory.'/screenshots');
+
 // Start job-wide services.
 $selenium_is_running = selenium_is_running($selenium_host, $selenium_port);
 $xvfb = NULL;
@@ -120,12 +124,11 @@ if (!empty($tests)) {
 		echo '## Running test: ' . $test->getTestClassName()                        . PHP_EOL;
 		echo '####################################################################' . PHP_EOL;
 
-		$junit_file = realpath($results_directory) . '/' . $test->getTestClassName() . '.xml';
+		$junit_file = realpath($results_directory) . '/xml/' . $test->getTestClassName() . '.xml';
 
 		// Record a screencast if there's a valid X buffer.
 		if (isset($xvfb)) {
-			//$screencast_file = $results_directory . '/' . $test->getTestClassName() . '.mp4';
-			$screencast_file = $test->getTestClassName() . '.mp4';
+			$screencast_file = $results_directory . '/video/' . $test->getTestClassName() . '.mp4';
 			$screencast = new ScreencastBackgroundService($xvfb, $screencast_file);
 		}
 
