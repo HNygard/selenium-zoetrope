@@ -73,6 +73,8 @@ if ( isset($options['r']) ) {
     if ( strpos( $results_directory, '/' ) === false ) $results_directory = __DIR__ . '/' . $results_directory;
 }
 
+$results_directory = realpath($results_directory);
+
 echo "base_url:          $base_url".PHP_EOL;
 echo "selenium_host:     $selenium_host".PHP_EOL;
 echo "selenium_port:     $selenium_port".PHP_EOL;
