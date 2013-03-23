@@ -57,7 +57,6 @@ abstract class BackgroundService
 
     public function getPid()
     {
-        global $selenium_host;
         if (isset($this->pid_file_name)) {
             return file_get_contents($this->pid_file_name);
         } else {
@@ -67,7 +66,6 @@ abstract class BackgroundService
 
     public function __destruct()
     {
-        global $selenium_host;
         $pid = $this->getPid();
         if (isset($pid)) {
             echo 'Killing background service ' . $pid . PHP_EOL;
@@ -242,9 +240,6 @@ class SeleniumTest
         $text .= '$screenshot = true;' . PHP_EOL;
         $text .= '$screenshot_url = \'http://todo/\';' . PHP_EOL;
         $text .= '$screenshot_path = \'' . realpath($results_directory . '/screenshots/') . '\';' . PHP_EOL;
-
-        // TODO: remove debug
-        echo PHP_EOL . PHP_EOL . $text . PHP_EOL . PHP_EOL;
 
         // Store a unique bootstrap file per test.
         $directory = sys_get_temp_dir() . '/selenium-bootstrap';
