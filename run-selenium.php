@@ -113,11 +113,11 @@ if (!is_dir($tests_directory) && !file_exists($tests_directory)) {
 
 // Prepare a clean environment.
 if ($output_startup_settings) {
-    echo "base_url:          $base_url" . PHP_EOL;
-    echo "selenium_host:     $selenium_host" . PHP_EOL;
-    echo "selenium_port:     $selenium_port" . PHP_EOL;
-    echo "tests_directory:   $tests_directory" . PHP_EOL;
-    echo "results_directory: $results_directory" . PHP_EOL;
+    echo "base_url:          $base_url\n";
+    echo "selenium_host:     $selenium_host\n";
+    echo "selenium_port:     $selenium_port\n";
+    echo "tests_directory:   $tests_directory\n";
+    echo "results_directory: $results_directory\n";
 }
 
 error_reporting(E_ALL);
@@ -166,8 +166,15 @@ if (!empty($tests)) {
             $screencast = new ScreencastBackgroundService($xvfb, $screencast_file);
         }
 
-        // Run the test and store the output.
+
+        // -------------------------------------------------------------
+        // ------------- Run the test and store the output -------------
+        // -------------------------------------------------------------
+
         $test->run($junit_file);
+
+        // -------------------------------------------------------------
+
 
         // Stop the screencast if one is active.
         if (isset($screencast)) {
