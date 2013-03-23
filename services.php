@@ -151,7 +151,7 @@ class SeleniumBackgroundService extends BackgroundService implements SeleniumSer
                 'java' .
                 ' -jar ' . str_replace(' ', '\ ', __DIR__ . '/selenium-server-*.jar') .
                 ' -singlewindow' .
-                ' -firefoxProfileTemplate "' . __DIR__ . '/ffProfile"' .
+            //    ' -firefoxProfileTemplate "' . __DIR__ . '/ffProfile"' .
                 ' -port ' . $this->port;
 
         $this->startProcess($log_file, $command);
@@ -184,7 +184,7 @@ class SeleniumForegroundService extends Service implements SeleniumServiceInterf
         $command = 'java' .
             ' -jar ' . str_replace(' ', '\ ', __DIR__ . '/selenium-server-*.jar') .
             ' -singlewindow' .
-            ' -firefoxProfileTemplate "' . __DIR__ . '/ffProfile"' .
+        //    ' -firefoxProfileTemplate "' . __DIR__ . '/ffProfile"' .
             ' -port ' . $this->port;
 
         $this->startProcess($log_file, $command);
