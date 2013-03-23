@@ -10,7 +10,7 @@ abstract class BackgroundService
 
     protected function startProcess($command)
     {
-        global $selenium_host, $running_ssh;
+        global $selenium_host;
         // Store the output of the background service and it's pid in temporary
         // files in the system tmp directory.
         //$directory = sys_get_temp_dir() . '/background-services';
@@ -30,11 +30,7 @@ abstract class BackgroundService
         echo PHP_EOL;
 
         $command = sprintf("%s > %s 2>&1 & echo $! > %s", $command, $this->output_file_name, $this->pid_file_name);
-        if ($running_ssh) {
-            exec('ssh ' . $selenium_host . ' \'' . $command . ' &\'');
-        } else {
-            exec($command);
-        }
+        exec($command);
 
         $remaining_tries = 60;
         while ($remaining_tries > 0 && !$this->isReady()) {
@@ -43,9 +39,9 @@ abstract class BackgroundService
         }
 
         if ($remaining_tries == 0) {
-            echo 'Background service failed:' . PHP_EOL;
+            echo 'Service failed:' . PHP_EOL;
             echo $this->getOutput();
-            throw new Exception('Background service did not start.');
+            throw new Exception('Service did not start.');
         }
     }
 
@@ -56,26 +52,14 @@ abstract class BackgroundService
 
     public function getOutput()
     {
-        global $selenium_host, $running_ssh;
-
-        if ($running_ssh) {
-            exec('ssh ' . $selenium_host . ' \'cat ' . $this->output_file_name . '\'', $output);
-            return implode($output, PHP_EOL);
-        } else {
-            return file_get_contents($this->output_file_name);
-        }
+        return file_get_contents($this->output_file_name);
     }
 
     public function getPid()
     {
-        global $selenium_host, $running_ssh;
+        global $selenium_host;
         if (isset($this->pid_file_name)) {
-            if ($running_ssh) {
-                exec('ssh ' . $selenium_host . ' \'cat ' . $this->pid_file_name . '\'', $pid);
-                return $pid[0];
-            } else {
-                return file_get_contents($this->pid_file_name);
-            }
+            return file_get_contents($this->pid_file_name);
         } else {
             return NULL;
         }
@@ -83,20 +67,16 @@ abstract class BackgroundService
 
     public function __destruct()
     {
-        global $selenium_host, $running_ssh;
+        global $selenium_host;
         $pid = $this->getPid();
         if (isset($pid)) {
             echo 'Killing background service ' . $pid . PHP_EOL;
-            if ($running_ssh) {
-                exec('ssh ' . $selenium_host . ' \'kill ' . $pid . '\'');
-            } else {
-                exec('kill ' . $pid);
-            }
-            zoetrope_rm($this->pid_file_name);
+            exec('kill ' . $pid);
+            unlink($this->pid_file_name);
         }
         //echo PHP_EOL.'########## Flushing log ##########'.PHP_EOL;
         //echo $this->getOutput().PHP_EOL.PHP_EOL;
-        zoetrope_rm($this->output_file_name);
+        unlink($this->output_file_name);
     }
 }
 
@@ -331,19 +311,4 @@ function selenium_is_running($host, $port)
     }
     curl_close($ch);
     return $success;
-}
-
-/**
- * Removed a file, over SSH or in local file system
- *
- * @param string $file Name of the file
- */
-function zoetrope_rm($file)
-{
-    global $selenium_host, $running_ssh;
-    if ($running_ssh) {
-        exec('ssh ' . $selenium_host . ' \'rm ' . $file . '\'');
-    } else {
-        unlink($file);
-    }
 }

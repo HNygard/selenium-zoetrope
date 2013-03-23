@@ -93,10 +93,6 @@ if(is_null($base_url)) {
     exit(1);
 }
 
-// System settings
-$running_ssh = false;
-
-
 // Prepare a clean environment.
 
 // Ensure a clean destination for results exists.
