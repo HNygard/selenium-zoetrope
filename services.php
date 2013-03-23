@@ -66,14 +66,20 @@ abstract class BackgroundService
 
     public function __destruct()
     {
+        global $output_startup_services;
         $pid = $this->getPid();
         if (isset($pid)) {
-            echo 'Killing background service ' . $pid . PHP_EOL;
+            if ($output_startup_services) {
+                echo 'Killing background service ' . $pid . PHP_EOL;
+            }
             exec('kill ' . $pid);
             unlink($this->pid_file_name);
         }
+
+        // Comment out for less verbose logging
         //echo PHP_EOL.'########## Flushing log ##########'.PHP_EOL;
         //echo $this->getOutput().PHP_EOL.PHP_EOL;
+
         unlink($this->output_file_name);
     }
 }
@@ -142,8 +148,11 @@ class SeleniumBackgroundService extends BackgroundService implements SeleniumSer
     public function __construct(XWindowsServiceInterface $display, $port)
     {
         $this->port = $port;
-
-        $command = 'export DISPLAY=localhost:' . $this->port . '.0; java -jar ' . __DIR__ . '/selenium-server-standalone-2.*.jar -port ' . $this->port;
+        $command =
+             'export DISPLAY=localhost:' . $this->port . '.0; '.
+                'java' .
+                ' -jar ' . __DIR__ . '/selenium-server-standalone-2.*.jar'.
+                ' -port ' . $this->port;
 
         $this->startProcess($command);
     }
@@ -260,6 +269,7 @@ class SeleniumTest
         echo 'Running: ' . $command . PHP_EOL;
         $output = shell_exec($command);
         echo $output;
+
         chdir($old_working_directory);
     }
 
@@ -283,7 +293,7 @@ class SeleniumTest
 function selenium_get_all_tests($directory, SeleniumServiceInterface $selenium, $base_url)
 {
     $tests = array();
-    $test_files = explode(PHP_EOL, trim(shell_exec('find ' . $directory . ' | grep php$')));
+    $test_files = explode(PHP_EOL, trim(shell_exec('find "' . $directory . '" | grep .php$')));
     if (!empty($test_files) && !empty($test_files[0])) {
         foreach ($test_files as $test_file) {
             $tests[] = new SeleniumTest($selenium, $test_file, $base_url);
