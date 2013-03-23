@@ -96,7 +96,7 @@ if (is_null($base_url)) {
 // Prepare a clean environment.
 
 // Ensure a clean destination for results exists.
-exec('rm -rf ' . $results_directory);
+exec('rm -rf "' . $results_directory . '"');
 mkdir($results_directory);
 
 mkdir($results_directory . '/xml');
