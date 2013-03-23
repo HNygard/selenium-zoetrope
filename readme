@@ -1,6 +1,26 @@
 Based on https://launchpad.net/selenium-zoetrope under GNU LGPL v3.
 
+Some features:
 - Screenshots
 - Video recording
 - HTML report
 - Mail report
+- Unstable tests handling (can automaticly retry the job in Jenkins)
+
+Jenkins setup:
+- Add a build step with shell execution and the following command:
+	path/to/zoetrope/in/repository/seleniumstart.sh -u "http://path.to.your.site.example.com"
+- Enable the plugin "Jenkins Text Finder"
+	- Check "Also search the console output" and add the following expression
+		Build state\: UNSTABLE
+	- Check "Unstable if found"
+- Enable "Publish HTML reports"
+	- "HTML directory to archive": path/to/zoetrope/results
+	- "Index page[s]": result.html
+	- "Report title": HTML Report
+	- "Keep past HTML reports": checked
+- Enable "Publish JUnit test result report"
+	- "Test report XMLs": test/zoetrope/results/*.xml
+- Enable the plugin "Editable Email Notification"
+	- Set "Project Recipient List" to your mailing list or just your email
+	- "Default Content": ${FILE,path=path/to/zoetrope/results/mail.html}
