@@ -7,6 +7,7 @@ require __DIR__ . '/classes/Zoetrope_Result_Test.php';
 require __DIR__ . '/classes/Zoetrope_Result_Testcase.php';
 require __DIR__ . '/classes/Zoetrope_Result_Error.php';
 
+/*
 Make executable:
 chmod +x run-selenium.php
 
@@ -15,6 +16,17 @@ Look at arguments:
 
 Run against Google:
 ./run-selenium.php ./tests/ ./junit-reports/ http://www.google.com/ selenium.server.com 4444
+
+Example 2:
+./run-selenium.php -u "http://example.com" [--host 127.0.0.1] [-p 4444] [-t tests] [-r results] [-b] [-c]
+
+
+
+Known issues:
+- Firefox does not show linenumbers next to code correctly
+
+Todo:
+- Allow run in background without video recording
 
 */
 
