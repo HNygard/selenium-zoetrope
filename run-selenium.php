@@ -24,7 +24,7 @@ $opts['p:'] = ' [port]                = Selenium server port. "random" for rando
 $opts['t:'] = ' [dir/file]            = Path to test directory(/file for single test). This is where tests are discovered.';
 $opts['r:'] = ' [dir]                 = Path to result directory (any files already in directory will be deleted!).';
 $opts['u:'] = ' [url]                 = URL to website (The website to run the tests against)';
-
+$opts['o:'] = ' [output type]         = What to output';
 $longopts = array();
 $longopts ['host:'] = ' [ip/host]         = Selenium server hostname or ip';
 
@@ -44,6 +44,8 @@ $selenium_host = '127.0.0.1'; // The default hostname for Selenium RC
 $selenium_port = 4444; // The default port number for Selenium RC
 $tests_directory = __DIR__ . '/tests'; // The default location of tests
 $results_directory = __DIR__ . '/results'; // The default location to put results directory
+// Other options
+$output_type = 'full'; // What output to show
 
 // Override defaults with user input
 if (isset($options['h'])) {
@@ -58,6 +60,7 @@ if (isset($options['h'])) {
 
 if (isset($options['u'])) $base_url = $options['u'];
 if (isset($options['host'])) $selenium_host = $options['host'];
+if (isset($options['o'])) $output_type = $options['o'];
 if (isset($options['p'])) {
     if ($options['p'] == 'random' || $options['p'] == 'rnd' || $options['p'] == 'rand')
         $selenium_port = rand(10000, 20000);
@@ -75,17 +78,26 @@ if (isset($options['r'])) {
 
 $results_directory = realpath($results_directory);
 
+// Check output type
+if ($output_type == 'simple') {
+    $output_startup_settings = false;
+    $output_tests_failed = true;
+    $output_tests_success = false;
+    $output_tests_skipped = false;
+    $output_startup_services = false;
+} else {
+    // -> $output_type = full
+    $output_startup_settings = true;
+    $output_tests_failed = true;
+    $output_tests_success = true;
+    $output_tests_skipped = true;
+    $output_startup_services = true;
+}
 
 echo PHP_EOL;
 echo '####################################################################' . PHP_EOL;
 echo '## Running Selenium tests' . PHP_EOL;
 echo '####################################################################' . PHP_EOL;
-
-echo "base_url:          $base_url" . PHP_EOL;
-echo "selenium_host:     $selenium_host" . PHP_EOL;
-echo "selenium_port:     $selenium_port" . PHP_EOL;
-echo "tests_directory:   $tests_directory" . PHP_EOL;
-echo "results_directory: $results_directory" . PHP_EOL;
 
 
 if (is_null($base_url)) {
@@ -93,7 +105,22 @@ if (is_null($base_url)) {
     exit(1);
 }
 
+// Check if test directory or file exists, exit if not
+if (!is_dir($tests_directory) && !file_exists($tests_directory)) {
+    echo 'FATAL ERROR: Test directory or file does not exist, exiting...' . PHP_EOL;
+    exit(1);
+}
+
 // Prepare a clean environment.
+if ($output_startup_settings) {
+    echo "base_url:          $base_url" . PHP_EOL;
+    echo "selenium_host:     $selenium_host" . PHP_EOL;
+    echo "selenium_port:     $selenium_port" . PHP_EOL;
+    echo "tests_directory:   $tests_directory" . PHP_EOL;
+    echo "results_directory: $results_directory" . PHP_EOL;
+}
+
+error_reporting(E_ALL);
 
 // Ensure a clean destination for results exists.
 exec('rm -rf "' . $results_directory . '"');
@@ -108,10 +135,14 @@ $selenium_is_running = selenium_is_running($selenium_host, $selenium_port);
 $xvfb = NULL;
 $selenium = NULL;
 if ($selenium_is_running) {
-    echo 'Selenium is already running. Using the existing service.' . PHP_EOL;
+    if ($output_startup_services) {
+        echo 'Selenium is already running. Using the existing service.' . PHP_EOL;
+    }
     $selenium = new SeleniumExternalService($selenium_host, $selenium_port);
 } else {
-    echo 'Selenium is not running. Starting a new, local service.' . PHP_EOL;
+    if ($output_startup_services) {
+        echo 'Selenium is not running. Starting a new, local service.' . PHP_EOL;
+    }
     // Use the Selenium port for the X display number, too.
     $x_display_number = $selenium_port;
     $xvfb = new XvfbBackgroundService($x_display_number, 1200, 2000);

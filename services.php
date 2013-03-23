@@ -299,7 +299,10 @@ function selenium_get_all_tests($directory, SeleniumServiceInterface $selenium, 
 
 function selenium_is_running($host, $port)
 {
-    echo 'Checking if Selenium is active at ' . $host . ':' . $port . PHP_EOL;
+    global $output_startup_services;
+    if ($output_startup_services) {
+        echo 'Checking if Selenium is active at ' . $host . ':' . $port . PHP_EOL;
+    }
     $success = FALSE;
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, 'http://' . $host . ':' . $port . '/selenium-server/driver/?cmd=testComplete');
