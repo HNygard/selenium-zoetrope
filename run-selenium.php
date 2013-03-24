@@ -171,6 +171,8 @@ echo '####################################################################' . PH
 
 if (is_null($base_url)) {
     echo PHP_EOL . PHP_EOL . 'Error: Missing base url' . PHP_EOL;
+    echo 'Specify using:' . PHP_EOL;
+    echo '  -u "http://example.com"' . PHP_EOL;
     exit(1);
 }
 

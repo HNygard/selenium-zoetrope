@@ -1,1 +1,1 @@
-php ./run-selenium.php --printer Zoetrope_PHPUnitTestListenerTestdox -t ${1}
+php ./run-selenium.php --include-path "`pwd`/classes/" --printer Zoetrope_PHPUnitTestListenerTestdox -t $@

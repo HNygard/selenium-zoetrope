@@ -30,6 +30,7 @@ php $EXEC_FILE -bc \
  -p random \
  -e "$VIDEO_URL" \
  --resolution "988x1760" \
+ --include-path "`pwd`/classes/" \
  --printer Zoetrope_PHPUnitTestListenerTestdox \
  --ss "$SCREENSHOT_URL" \
  -o simple \
@@ -37,4 +38,3 @@ php $EXEC_FILE -bc \
  
  
 # --browser "*firefox /var/lib/jenkins/firefox7.0.1/firefox-bin" \
-# --include-path "./../" \
