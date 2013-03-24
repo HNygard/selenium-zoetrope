@@ -10,7 +10,6 @@
 # Example: path/to/zoetrope
 BASE_DIR=$(dirname $0)
 
-
 EXEC_FILE="$WORKSPACE/$BASE_DIR/run-selenium.php"
 RESULTS_DIR="$WORKSPACE/$BASE_DIR/results"
 #TESTS_DIR="$WORKSPACE/test/selenium"
@@ -29,7 +28,7 @@ php $EXEC_FILE -bc \
  -p random \
  -e "$VIDEO_URL" \
  --resolution "988x1760" \
- --include-path "`pwd`/classes/" \
+ --include-path "$BASE_DIR/classes/" \
  --printer Zoetrope_PHPUnitTestListenerTestdox \
  --ss "$SCREENSHOT_URL" \
  -o simple \
