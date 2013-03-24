@@ -174,7 +174,7 @@ class SeleniumBackgroundService extends BackgroundService implements SeleniumSer
     }
 }
 
-class SeleniumForegroundService extends Service implements SeleniumServiceInterface
+class SeleniumForegroundService extends BackgroundService implements SeleniumServiceInterface
 {
     protected $port;
 
