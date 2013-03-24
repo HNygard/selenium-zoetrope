@@ -15,6 +15,7 @@ abstract class BackgroundService
         if ($output_startup_services) {
             echo 'Starting service: ' . $command . ' (logging to ' . $log_file . ')' . PHP_EOL;
         }
+        $this->service_log_file = $log_file;
 
         $unique = time() . rand(0, 100);
         $this->pid_file_name = 'background-service-' . $unique . '.pid';
