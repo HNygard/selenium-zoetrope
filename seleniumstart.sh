@@ -7,11 +7,12 @@
 # When debugging, on might want to add "-o full" to get more output
 #     path/to/zoetrope/seleniumstart.sh -t "path/to/tests" -u "http://yoursite.example.com" -o full
 
-# Example: path/to/zoetrope
-BASE_DIR=$(dirname $0)
+# Path to Zoetrope
+# Example: /var/lib/jenkints/job/MyJob/workspace/path/to/zoetrope
+ABS_PATH=$(cd "$(dirname "$0")"; pwd)
 
-EXEC_FILE="$WORKSPACE/$BASE_DIR/run-selenium.php"
-RESULTS_DIR="$WORKSPACE/$BASE_DIR/results"
+EXEC_FILE="$ABS_PATH/run-selenium.php"
+RESULTS_DIR="$ABS_PATH/results"
 #TESTS_DIR="$WORKSPACE/test/selenium"
 VIDEO_URL="https://jenkins.example.com/video/${JOB_NAME}/${BUILD_NUMBER}/"
 SCREENSHOT_URL="https://jenkins.example.com/job/${JOB_NAME}/${BUILD_NUMBER}/HTML_Report"
@@ -28,7 +29,7 @@ php $EXEC_FILE -bc \
  -p random \
  -e "$VIDEO_URL" \
  --resolution "988x1760" \
- --include-path "$BASE_DIR/classes/" \
+ --include-path "$ABS_PATH/classes/" \
  --printer Zoetrope_PHPUnitTestListenerTestdox \
  --ss "$SCREENSHOT_URL" \
  -o simple \
