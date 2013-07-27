@@ -146,14 +146,19 @@ class SeleniumBackgroundService extends BackgroundService implements SeleniumSer
 
     public function __construct(XWindowsServiceInterface $display, $port, $log_file)
     {
+        global $selenium_firefox_profile;
+
         $this->port = $port;
         $command =
             'export DISPLAY="' . $display->getDisplay() . '" && ' .
                 'java' .
                 ' -jar ' . str_replace(' ', '\ ', __DIR__ . '/selenium-server-*.jar') .
                 ' -singlewindow' .
-            //    ' -firefoxProfileTemplate "' . __DIR__ . '/ffProfile"' .
                 ' -port ' . $this->port;
+
+        if(!empty($selenium_firefox_profile)) {
+                $command .= ' -firefoxProfileTemplate "' . $selenium_firefox_profile . '"' ;
+        }
 
         $this->startProcess($log_file, $command);
     }

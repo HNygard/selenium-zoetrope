@@ -60,6 +60,7 @@ $longopts['browser:'] = '[browser]       = Selenium browser to use. Example: "*f
 $longopts['resolution:'] = '[resolution] = Set browser width and height, example: 1024x768';
 $longopts['printer:'] = '[class]         = Set PHPUnit printer. Example: MyPHPUnitTestListener (extends PHPUnit_TextUI_ResultPrinter)';
 $longopts['include-path:'] = '[path]     = Set PHPUnit include-path.';
+$longopts['ffprofile:']    = '[path]     = Set Firefox profile path (can save self signed certificates)';
 
 $opt_string = '';
 foreach ($opts as $key => $option) {
@@ -83,6 +84,7 @@ $copytests = false; // Pr. default copy tests to results directory?
 $external_url = ''; // If videos are moved by a script to a different URL, use this option to set it, so result.html shows correct video
 $group = ''; // Group of tests to run against
 $screenshot_url = ''; // URL to screenshots (for the user)
+$selenium_firefox_profile = '';
 // Other options
 $res_width = 988; // Width of Xvfb desktop (and effectively also browser window)
 $res_height = 1760; // Height of Xvfb desktop (and effectively also browser window)
@@ -116,6 +118,7 @@ if (isset($options['ss'])) $screenshot_url = $options['ss'];
 if (isset($options['browser'])) $selenium_browser = $options['browser'];
 if (isset($options['printer'])) $phpunit_printer = $options['printer'];
 if (isset($options['include-path'])) $phpunit_includepath = $options['include-path'];
+if (isset($options['ffprofile'])) { $selenium_firefox_profile = $options['ffprofile']; }
 if (isset($options['resolution'])) {
     // Make sure resolution > 0x0 and no bigger than 9999x9999 (and valid)
     if (preg_match('#^[1,9]\d{0,3}x[1,9]\d{0,3}$#', $options['resolution'])) {
@@ -199,6 +202,7 @@ if ($output_startup_settings) {
     echo "selenium_host:     $selenium_host\n";
     echo "selenium_port:     $selenium_port\n";
     echo "selenium_browser:  $selenium_browser\n";
+    echo "selenium_firefox_profile: $selenium_firefox_profile\n";
     echo "onscreen:          $onscreen\n";
     echo "copytests:         $copytests\n";
     echo "tests_directory:   $tests_directory\n";
