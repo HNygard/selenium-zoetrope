@@ -245,10 +245,10 @@ foreach($result->getTests() as $testcase) {
         '</tr>' .
         '<tr>' .
         '<td valign="top" align="right">' .
-        '<font face="Courier New" size=1>' . $linenumbers . '</font>' .
+        '<font face="Courier New" style="font-size: 10px; line-height: 15px;">' . $linenumbers . '</font>' .
         '</td>' .
         '<td valign="top">' .
-        '<font face="Courier New" size=1>' . $testcase->getSourcecode() . '</font>' .
+        '<font face="Courier New" style="font-size: 10px; line-height: 15px;">' . $testcase->getSourcecode() . '</font>' .
         '</td>' .
         '</tr>' .
         '</table>' .
