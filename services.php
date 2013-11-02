@@ -552,6 +552,29 @@ function removeDuplicatesBasedOnPattern($pattern, $split, $inputstring)
     return implode(PHP_EOL, $output);
 }
 
+function _copyOrMoveFilesToDirectory ($tag, $files, $to_directory, $move, $output_startup_services) {
+    if($move) {
+        $cmd = 'mv';
+        $cmd_text = 'Moving';
+    }
+    else {
+        $cmd = 'cp';
+        $cmd_text = 'Copying';
+    }
+
+    $count = 0;
+    foreach (glob($files) as $filename) {
+        $count++;
+        if ($output_startup_services) {
+            echo '['.$tag.'] '.$cmd_text.' "' . $filename . '" to "' . $to_directory . '"' . PHP_EOL;
+        }
+        exec($cmd.' "' . $filename . '" "' . $to_directory . '"');
+    }
+    if($count == 0 && $output_startup_services) {
+        echo '['.$tag.'] No files found with pattern "'.$files.'".' . PHP_EOL;
+    }
+}
+
 
 /**
  * Copy tests, and move test screenshots and test descriptions into results directory if specified
@@ -565,42 +588,23 @@ function copyAndMoveTestResultsToResultsDirectory($tests_directory, $results_dir
     if (function_exists('glob')) {
         // glob only exists in PHP >= 5.3
         // Copy tests to the results
-        foreach (glob($tests_directory . '/*.php') as $filename) {
-            if ($output_startup_services) {
-                echo 'Copying "' . $filename . '" to "' . $results_directory . '"' . PHP_EOL;
-            }
-            exec('cp "' . $filename . '" "' . $results_directory . '"');
-        }
+        _copyOrMoveFilesToDirectory('Tests', $tests_directory . '/*.php', $results_directory, false, $output_startup_services);
+
         // Move auto-generated descriptions
-        foreach (glob($tests_directory . '/*_gen.txt') as $filename) {
-            if ($output_startup_services) {
-                echo 'Moving "' . $filename . '" to "' . $results_directory . '"' . PHP_EOL;
-            }
-            exec('mv "' . $filename . '" "' . $results_directory . '"');
-        }
+        _copyOrMoveFilesToDirectory('Test description, generated', $tests_directory . '/*_gen.txt', $results_directory, true, $output_startup_services);
+
         // Copy .txt description
-        foreach (glob($tests_directory . '/*.txt') as $filename) {
-            if ($output_startup_services) {
-                echo 'Copying "' . $filename . '" to "' . $results_directory . '"' . PHP_EOL;
-            }
-            exec('cp "' . $filename . '" "' . $results_directory . '"');
-        }
+        _copyOrMoveFilesToDirectory('Test description in text file', $tests_directory . '/*.txt', $results_directory, false, $output_startup_services);
+
         // Copy .html description
-        foreach (glob($tests_directory . '/*.html') as $filename) {
-            if ($output_startup_services) {
-                echo 'Copying "' . $filename . '" to "' . $results_directory . '"' . PHP_EOL;
-            }
-            exec('cp "' . $filename . '" "' . $results_directory . '"');
-        }
+        _copyOrMoveFilesToDirectory('Test description in HTML', $tests_directory . '/*.html', $results_directory, false, $output_startup_services);
+
         // Move auto-generated screenshots
-        foreach (glob($tests_directory . '/*.png') as $filename) {
-            if ($output_startup_services) {
-                echo 'Moving "' . $filename . '" to "' . $results_directory . '"' . PHP_EOL;
-            }
-            exec('mv "' . $filename . '" "' . $results_directory . '"');
-        }
-    } else {
+        _copyOrMoveFilesToDirectory('Screenshots', $tests_directory . '/*.png', $results_directory, true, $output_startup_services);
+    }
+    else {
         // -> Glob() does not exits. PHP version must be less than 5.3.
+        // TODO: throw exception, less than 5.3 should not be supported!
         // Copy tests to the results
         exec('cp "' . $tests_directory . '/"*.php "' . $results_directory . '"');
         // Move auto-generated descriptions
