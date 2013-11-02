@@ -601,6 +601,7 @@ function copyAndMoveTestResultsToResultsDirectory($tests_directory, $results_dir
 
         // Move auto-generated screenshots
         _copyOrMoveFilesToDirectory('Screenshots', $tests_directory . '/*.png', $results_directory, true, $output_startup_services);
+        _copyOrMoveFilesToDirectory('Screenshots-subdir', $tests_directory . '/*/*.png', $results_directory, true, $output_startup_services);
     }
     else {
         // -> Glob() does not exits. PHP version must be less than 5.3.
