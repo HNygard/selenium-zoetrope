@@ -7,20 +7,48 @@ Some features:
 - Mail report
 - Unstable tests handling (can automaticly retry the job in Jenkins)
 
+- Need some packages on the server:
+
+    sudo apt-get install php-pear xvfb firefox
+    sudo pear upgrade PEAR
+    sudo pear channel-discover pear.symfony-project.com
+    sudo pear channel-discover components.ez.no
+    sudo pear channel-discover pear.phpunit.de
+    sudo pear install --alldeps --force phpunit/PHPUnit
+    sudo pear install phpunit/PHPUnit_Selenium
+
+- Add zoetrope as a sub module (example is putting Zoetrope in the tests folder)
+
+    git submodule git://github.com/HNygard/selenium-zoetrope.git tests/zoetrope
+
+- Make a copy of "seleniumstart.sh" into your repository.
+
+    cp tests/zoetrope/seleniumstart.sh tests/seleniumstart.sh
+
+- Edit URL for Jenkins etc in tests/seleniumstart.sh. Also remember to change things like include path. It should point
+  to the class directory inside the zoetrope directory.
+
 Jenkins setup:
+
+- Install plugins
+
+	Jenkins Text Finder (if you want to use unstable builds)
+
+
 - Add a build step with shell execution and the following command:
-	path/to/zoetrope/in/repository/seleniumstart.sh -u "http://path.to.your.site.example.com"
+	tests/seleniumstart.sh -u "http://path.to.your.site.example.com"
+
 - Enable the plugin "Jenkins Text Finder"
 	- Check "Also search the console output" and add the following expression
 		Build state\: UNSTABLE
 	- Check "Unstable if found"
 - Enable "Publish HTML reports"
-	- "HTML directory to archive": path/to/zoetrope/results
+	- "HTML directory to archive": tests/zoetrope/results
 	- "Index page[s]": result.html
 	- "Report title": HTML Report
 	- "Keep past HTML reports": checked
 - Enable "Publish JUnit test result report"
-	- "Test report XMLs": test/zoetrope/results/*.xml
+	- "Test report XMLs": tests/zoetrope/results/*.xml
 - Enable the plugin "Editable Email Notification"
 	- Set "Project Recipient List" to your mailing list or just your email
-	- "Default Content": ${FILE,path=path/to/zoetrope/results/mail.html}
+	- "Default Content": ${FILE,path=tests/zoetrope/results/mail.html}
