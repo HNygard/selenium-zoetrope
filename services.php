@@ -317,12 +317,12 @@ class SeleniumTest
         file_put_contents($this->bootstrapFile, $text);
     }
 
-    public function run($file_log_junit, $file_testdox_text)
+    public function run($phpunit_cmd, $file_log_junit, $file_testdox_text)
     {
         global $output_startup_services, $codecoverage_url, $phpunit_printer, $phpunit_includepath;
         $old_working_directory = getcwd();
         chdir(dirname($this->testFileName));
-        $command = 'phpunit ';
+        $command = $phpunit_cmd . ' ';
         $command .= '--log-junit "' . $file_log_junit . '" ';
         $command .= '--bootstrap "' . $this->bootstrapFile . '" ';
         $command .= '--testdox-text "' . $file_testdox_text . '" ';

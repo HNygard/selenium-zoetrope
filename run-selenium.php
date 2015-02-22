@@ -55,6 +55,7 @@ $longopts['ss:'] = '[screenshot URL]     = URL to screenshots (for the user) - t
     '                            Example: $this->screenshotUrl = $GLOBALS[\'screenshot_url\'];' . PHP_EOL .
     '                            $this->screenshotPath = pathinfo($test_file, PATHINFO_DIRNAME);' . PHP_EOL .
     '                            $this->captureScreenshotOnFailure = TRUE;';
+$longopts['phpunit-cmd'] = '[PHPUnit cmd]  = Command line for PHPUnit. Default \'phpunit\'.' . chr(10);
 $longopts['browser:'] = '[browser]       = Selenium browser to use. Example: "*firefox" or "*firefox /path/to/firefoxexecutable".' . chr(10) .
     '                            See http://stackoverflow.com/questions/2569977/list-of-selenium-rc-browser-launchers';
 $longopts['resolution:'] = '[resolution] = Set browser width and height, example: 1024x768';
@@ -79,6 +80,7 @@ $selenium_port = 4444; // The default port number for Selenium RC
 $selenium_browser = '*firefox'; // The default browser for Selenium RC
 $tests_directory = __DIR__ . '/tests'; // The default location of tests
 $results_directory = __DIR__ . '/results'; // The default location to put results directory
+$phpunit_cmd = 'phpunit';
 $onscreen = true; // Pr. default run in foreground or background?
 $copytests = false; // Pr. default copy tests to results directory?
 $external_url = ''; // If videos are moved by a script to a different URL, use this option to set it, so result.html shows correct video
@@ -115,6 +117,7 @@ if (isset($options['c'])) $copytests = true;
 if (isset($options['o'])) $output_type = $options['o'];
 if (isset($options['cc'])) $codecoverage_url = $options['cc'];
 if (isset($options['ss'])) $screenshot_url = $options['ss'];
+if (isset($options['phpunit-cmd'])) { $phpunit_cmd = $options['phpunit-cmd']; }
 if (isset($options['browser'])) $selenium_browser = $options['browser'];
 if (isset($options['printer'])) $phpunit_printer = $options['printer'];
 if (isset($options['include-path'])) $phpunit_includepath = $options['include-path'];
@@ -203,6 +206,8 @@ if ($output_startup_settings) {
     echo "selenium_port:     $selenium_port\n";
     echo "selenium_browser:  $selenium_browser\n";
     echo "selenium_firefox_profile: $selenium_firefox_profile\n";
+    echo "\n";
+    echo "phpunit cmd:       $phpunit_cmd\n";
     echo "onscreen:          $onscreen\n";
     echo "copytests:         $copytests\n";
     echo "tests_directory:   $tests_directory\n";
@@ -322,7 +327,7 @@ if (!empty($tests)) {
         // ------------- Run the test and store the output -------------
         // -------------------------------------------------------------
 
-        $test->run($file_log_junit2, $file_testdox_text2);
+        $test->run($phpunit_cmd, $file_log_junit2, $file_testdox_text2);
 
         // -------------------------------------------------------------
 
