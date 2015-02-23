@@ -55,7 +55,7 @@ $longopts['ss:'] = '[screenshot URL]     = URL to screenshots (for the user) - t
     '                            Example: $this->screenshotUrl = $GLOBALS[\'screenshot_url\'];' . PHP_EOL .
     '                            $this->screenshotPath = pathinfo($test_file, PATHINFO_DIRNAME);' . PHP_EOL .
     '                            $this->captureScreenshotOnFailure = TRUE;';
-$longopts['phpunit-cmd'] = '[PHPUnit cmd]  = Command line for PHPUnit. Default \'phpunit\'.' . chr(10);
+$longopts['phpunit-cmd:'] = '[PHPUnit cmd] = Command line for PHPUnit. Default \'phpunit\'.' . chr(10);
 $longopts['browser:'] = '[browser]       = Selenium browser to use. Example: "*firefox" or "*firefox /path/to/firefoxexecutable".' . chr(10) .
     '                            See http://stackoverflow.com/questions/2569977/list-of-selenium-rc-browser-launchers';
 $longopts['resolution:'] = '[resolution] = Set browser width and height, example: 1024x768';
