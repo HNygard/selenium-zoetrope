@@ -23,7 +23,7 @@ OK (1 test, 0 assertions)
 
 */
 
-class SeleniumTestTest extends PHPUnit_Extensions_SeleniumTestCase {
+class SeleniumTestTest extends PHPUnit_Extensions_Selenium2TestCase {
 	protected function setUp() {
 		global $selenium_server_host, $selenium_server_port, $target_browser, $target_url;
 		

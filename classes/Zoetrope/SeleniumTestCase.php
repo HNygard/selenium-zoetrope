@@ -1,33 +1,140 @@
 <?php
 
-require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
+require_once 'PHPUnit/Extensions/Selenium2TestCase.php';
+
+
+/**
+ * Wrapper to not modifiy all Selenium 1 command when moving to Selenium 2.
+ */
+class SeleniumTestCase_Selenium1Wrapper extends PHPUnit_Extensions_Selenium2TestCase {
+    /**
+     * @param $string
+     * @return PHPUnit_Extensions_Selenium2TestCase_Element
+     * @throws Exception
+     */
+    private function getCssSelectorFromSelenium1Stuff($string) {
+        if (substr($string, 0, strlen('name=')) == 'name=') {
+            return $this->byName(substr($string, strlen('name=')));
+        }
+        if (substr($string, 0, strlen('id=')) == 'id=') {
+            return $this->byCssSelector('#' . substr($string, strlen('id=')));
+        }
+        if (substr($string, 0, strlen('css=')) == 'css=') {
+            return $this->byCssSelector(substr($string, strlen('css=')));
+        }
+        if (substr($string, 0, strlen('//')) == '//') {
+            return $this->byXPath($string);
+        }
+        if ($string == 'body') {
+            return $this->byCssSelector($string);
+        }
+        throw new Exception('Unknown Selenium 1 selector: ' . $string);
+    }
+
+    public function click($string) {
+        $this->getCssSelectorFromSelenium1Stuff($string)
+            ->click();
+    }
+
+    public function type($string, $text) {
+        $element = $this->getCssSelectorFromSelenium1Stuff($string);
+        $element->clear();
+        $element->value($text);
+    }
+
+    public function isElementPresent($string) {
+        try {
+            $this->getCssSelectorFromSelenium1Stuff($string);
+            return true;
+        }
+        catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
+            if (strpos($e->getMessage(), 'no such element') !== false
+                && strpos($e->getMessage(), 'Unable to locate element:') !== false) {
+                return false;
+            }
+            throw $e;
+        }
+    }
+
+    public function assertElementPresent($locator) {
+        \PHPUnit\Framework\Assert::assertTrue($this->isElementPresent($locator));
+    }
+
+    public function assertElementNotPresent($locator) {
+        \PHPUnit\Framework\Assert::assertFalse($this->isElementPresent($locator));
+    }
+
+    public function assertElementContainsText($locator, $expected) {
+        \PHPUnit\Framework\Assert::assertContains($expected, $this->getText($locator));
+    }
+
+    public function assertElementNotContainsText($locator, $expected) {
+        \PHPUnit\Framework\Assert::assertNotContains($expected, $this->getText($locator));
+    }
+
+    public function getText($string) {
+        return $this->getCssSelectorFromSelenium1Stuff($string)
+                    ->text();
+    }
+
+    public function getTitle() {
+        return $this->title();
+    }
+
+    public function getHtmlSource() {
+        return $this->source();
+    }
+
+    public function getXpathCount($string) {
+        return count($this->elements($this->using('xpath')->value($string)));
+    }
+
+    public function mouseOver($locator) {
+        $this->moveto($this->getCssSelectorFromSelenium1Stuff($locator));
+    }
+
+    public function assertTextPresent($string) {
+        $this->assertElementContainsText('body', $string);
+    }
+
+    public function assertTextNotPresent($string) {
+        $this->assertElementNotContainsText('body', $string);
+    }
+
+    public function isTextPresent($string) {
+        return strpos($this->getText('body'), $string) === false;
+    }
+
+    public function isChecked($locator) {
+        return $this->getCssSelectorFromSelenium1Stuff($locator)
+            ->attribute('checked') == 'checked';
+    }
+
+    public function getAttribute($locator, $attribute_name) {
+        return $this->getCssSelectorFromSelenium1Stuff($locator)
+            ->attribute($attribute_name);
+    }
+
+    public function getValue($selector) {
+        return $this->getCssSelectorFromSelenium1Stuff($selector)
+            ->value();
+    }
+
+    public function selectByLabel($selector, $item) {
+        parent::select($this->getCssSelectorFromSelenium1Stuff($selector))->selectOptionByLabel($item);
+    }
+
+    public function selectByValue($selector, $item) {
+        parent::select($this->getCssSelectorFromSelenium1Stuff($selector))->selectOptionByValue($item);
+    }
+}
 
 /**
  * Test case that contains
  * - Error handling controlled by Zoetrope
  * - Convenience methods
- *
- * Already added in PHPUnit_Extensions_SeleniumTestCase in dev branch (github)
- * @method   assertTextPresent()
- * @method   assertTextNotPresent()
- * @method   assertChecked()
- * @method   assertNotChecked()
- * @method   assertElementNotPresent
- * @method   assertElementPresent
- *
- *
- * Not in dev branch @ Github:
- * @method   stop()
- * @method   start()
- * @method   setTimeout()
- * @method   setWaitForPageToLoad()
- * @method   setHost()
- * @method   setPort()
- * @method   setBrowser()
- * @method   setBrowserUrl()
- * @method   assertNotHtmlSource()
  */
-class Zoetrope_SeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
+class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
 
     // TODO: why is this public?
 
@@ -51,9 +158,8 @@ class Zoetrope_SeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         }
 
         if(isset($this->selenium_timeout)) {
-            $this->setTimeout($this->selenium_timeout / 1000);
+            $this->setDefaultWaitUntilTimeout($this->selenium_timeout / 1000);
         }
-        $this->setWaitForPageToLoad(true);
         $this->setHost($selenium_server_host);
         $this->setPort($selenium_server_port);
         $this->setBrowser($target_browser);
@@ -74,9 +180,10 @@ class Zoetrope_SeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
     }
 
     protected function captureScreenshotOf ( $descriptionOfScreenshot ) {
-        $uniqueid = ''; // TODO:!!
-        $this->drivers[0]->captureEntirePageScreenshot($this->screenshotPath.'/'.$this->testId.'.png');
-        echo 'Screenshot of "'.$descriptionOfScreenshot.'": ' . $this->screenshotUrl .'/'. $this->testId . '.png'.PHP_EOL;
+        $filepath = $this->screenshotPath . '/' . $this->getTestId() . '.png';
+        $screenshot = $this->currentScreenshot();
+        file_put_contents($filepath, $screenshot);
+        echo 'Screenshot of "' . $descriptionOfScreenshot . '": ' . $filepath . PHP_EOL;
     }
 
 
@@ -171,7 +278,11 @@ class Zoetrope_SeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
             $timeout = $this->selenium_timeout;
         }
         $start = time();
-        parent::waitForPageToLoad($timeout);
+        $this->waitUntil(function() {
+            return $this->execute(array('script' => 'return document.readyState;', 'args' => array())) == 'complete';
+        }, $timeout);
+        //parent::waitForPageToLoad($timeout);
+        // Not needed in Selenium 2?
         $end = time();
         if (($end - $start) >= ($timeout / 1000)) {
             throw new SeleniumTimeoutException('Timed out after '.$timeout.'ms.');
@@ -182,7 +293,7 @@ class Zoetrope_SeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         if ($waittime == null) {
             $waittime = $this->selenium_timeout;
         }
-        $this->open($url);
+        $this->url($url);
         $this->waitForPageToLoad($waittime);
     }
 
@@ -190,7 +301,7 @@ class Zoetrope_SeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         if ($waittime == null) {
             $waittime = $this->selenium_timeout;
         }
-        $this->goBack();
+        $this->back();
         $this->waitForPageToLoad($waittime);
     }
 
@@ -313,7 +424,7 @@ class Zoetrope_SeleniumTestCase extends PHPUnit_Extensions_SeleniumTestCase {
         return $stack;
     }
 
-    protected function onNotSuccessfulTest(Exception $e) {
+    public function onNotSuccessfulTest($e) {
 
         // Sleep for 10 seconds to keep the window open when recording and keep the browser open when running locally
         // This ensures that the video will contain some seconds of the actual failure scenario - the last frame.
