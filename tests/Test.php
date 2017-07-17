@@ -1,6 +1,6 @@
 <?php
 
-require_once 'PHPUnit/Extensions/SeleniumTestCase.php';
+require_once 'PHPUnit/Extensions/Selenium2TestCase.php';
 
 /**
  * http://seleniumhq.org/projects/remote-control/

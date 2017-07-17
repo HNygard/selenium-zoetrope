@@ -25,6 +25,9 @@ class SeleniumTestCase_Selenium1Wrapper extends PHPUnit_Extensions_Selenium2Test
         if (substr($string, 0, strlen('//')) == '//') {
             return $this->byXPath($string);
         }
+        if (substr($string, 0, strlen('link=')) == 'link=') {
+            return $this->byLinkText(substr($string, strlen('link=')));
+        }
         if ($string == 'body') {
             return $this->byCssSelector($string);
         }
@@ -50,6 +53,9 @@ class SeleniumTestCase_Selenium1Wrapper extends PHPUnit_Extensions_Selenium2Test
         catch (PHPUnit_Extensions_Selenium2TestCase_WebDriverException $e) {
             if (strpos($e->getMessage(), 'no such element') !== false
                 && strpos($e->getMessage(), 'Unable to locate element:') !== false) {
+                return false;
+            }
+            if (strpos($e->getMessage(), 'Returned node was not an HTML element') !== false) {
                 return false;
             }
             throw $e;
