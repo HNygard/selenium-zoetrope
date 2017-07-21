@@ -133,6 +133,10 @@ class SeleniumTestCase_Selenium1Wrapper extends PHPUnit_Extensions_Selenium2Test
     public function selectByValue($selector, $item) {
         parent::select($this->getCssSelectorFromSelenium1Stuff($selector))->selectOptionByValue($item);
     }
+
+    public function assertChecked($selector) {
+        \PHPUnit\Framework\Assert::assertTrue($this->getCssSelectorFromSelenium1Stuff($selector)->selected());
+    }
 }
 
 /**
