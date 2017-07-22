@@ -58,6 +58,12 @@ class SeleniumTestCase_Selenium1Wrapper extends PHPUnit_Extensions_Selenium2Test
             if (strpos($e->getMessage(), 'Returned node was not an HTML element') !== false) {
                 return false;
             }
+            if (strpos($e->getMessage(), 'Unable to locate element with name') !== false) {
+                return false;
+            }
+            if (strpos($e->getMessage(), 'Unable to locate a node using') !== false) {
+                return false;
+            }
             throw $e;
         }
     }
