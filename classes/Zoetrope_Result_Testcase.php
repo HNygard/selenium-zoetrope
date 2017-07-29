@@ -44,6 +44,9 @@ class Zoetrope_Result_Testcase {
     /* @var $tests Zoetrope_Result_Test[] */
     private $tests = array();
 
+    /* @var $systemOut String */
+    private $systemOut;
+
 
     /**
      * @param int  $i  Line number
@@ -324,5 +327,13 @@ class Zoetrope_Result_Testcase {
     public function getDuration()
     {
         return $this->duration;
+    }
+
+    public function addSystemOut($param) {
+        $this->systemOut = $param;
+    }
+
+    public function getSystemOut() {
+        return $this->systemOut;
     }
 }

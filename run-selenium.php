@@ -56,8 +56,6 @@ $longopts['ss:'] = '[screenshot URL]     = URL to screenshots (for the user) - t
     '                            $this->screenshotPath = pathinfo($test_file, PATHINFO_DIRNAME);' . PHP_EOL .
     '                            $this->captureScreenshotOnFailure = TRUE;';
 $longopts['phpunit-cmd:'] = '[PHPUnit cmd] = Command line for PHPUnit. Default \'phpunit\'.' . chr(10);
-$longopts['browser:'] = '[browser]       = Selenium browser to use. Example: "*firefox" or "*firefox /path/to/firefoxexecutable".' . chr(10) .
-    '                            See http://stackoverflow.com/questions/2569977/list-of-selenium-rc-browser-launchers';
 $longopts['resolution:'] = '[resolution] = Set browser width and height, example: 1024x768';
 $longopts['printer:'] = '[class]         = Set PHPUnit printer. Example: MyPHPUnitTestListener (extends PHPUnit_TextUI_ResultPrinter)';
 $longopts['include-path:'] = '[path]     = Set PHPUnit include-path.';
@@ -75,9 +73,8 @@ $options = getopt($opt_string, $longopts2);
 
 // Set defaults
 $base_url = null; // The default host to run the tests against
-$selenium_host = '127.0.0.1'; // The default hostname for Selenium RC
-$selenium_port = 4444; // The default port number for Selenium RC
-$selenium_browser = '*firefox'; // The default browser for Selenium RC
+$selenium_host = '127.0.0.1';
+$selenium_port = 4444;
 $tests_directory = __DIR__ . '/tests'; // The default location of tests
 $results_directory = __DIR__ . '/results'; // The default location to put results directory
 $phpunit_cmd = 'phpunit';
@@ -118,7 +115,6 @@ if (isset($options['o'])) $output_type = $options['o'];
 if (isset($options['cc'])) $codecoverage_url = $options['cc'];
 if (isset($options['ss'])) $screenshot_url = $options['ss'];
 if (isset($options['phpunit-cmd'])) { $phpunit_cmd = $options['phpunit-cmd']; }
-if (isset($options['browser'])) $selenium_browser = $options['browser'];
 if (isset($options['printer'])) $phpunit_printer = $options['printer'];
 if (isset($options['include-path'])) $phpunit_includepath = $options['include-path'];
 if (isset($options['ffprofile'])) { $selenium_firefox_profile = $options['ffprofile']; }
@@ -204,7 +200,6 @@ if ($output_startup_settings) {
     echo "base_url:          $base_url\n";
     echo "selenium_host:     $selenium_host\n";
     echo "selenium_port:     $selenium_port\n";
-    echo "selenium_browser:  $selenium_browser\n";
     echo "selenium_firefox_profile: $selenium_firefox_profile\n";
     echo "\n";
     echo "phpunit cmd:       $phpunit_cmd\n";
@@ -265,6 +260,7 @@ $build_error = false;
 $build_unstable = false;
 
 // Run tests.
+$selenium_browser = 'chrome';
 $tests = selenium_get_all_tests($tests_directory . '/' . $single_test, $selenium, $group, $base_url, $selenium_browser);
 if (!empty($tests)) {
 
@@ -367,11 +363,13 @@ if (!empty($tests)) {
         if (file_exists($filename_html)) {
             $description_file = basename($filename_html);
             $testdescription = testdescriptionHtmlFile($filename_html);
-        } elseif (file_exists($filename_txt)) {
+        }
+        elseif (file_exists($filename_txt)) {
             // Fallback to .txt if available
             $description_file = basename($filename_txt);
             $testdescription = testdescriptionTxtFile($filename_txt);
-        } else {
+        }
+        else {
             // Fallback to comments in testfile if available
             $description_file = '#';
             $testdescription = testdescriptionTestFile($test->getTestLocation(), $test->getTestClassName(), $tests_directory, $description_file);
@@ -393,7 +391,8 @@ if (!empty($tests)) {
                     $sometest2->setName(substr(trim($sometest), 4));
                     $sometest2->setHasError(false);
                     $testresult->addTest($sometest2);
-                } elseif (substr(trim($sometest), 0, 4) == '[ ] ') {
+                }
+                elseif (substr(trim($sometest), 0, 4) == '[ ] ') {
                     $sometest2 = new Zoetrope_Result_Test();
                     $sometest2->setName(substr(trim($sometest), 4));
                     $sometest2->setHasError(true);
@@ -405,7 +404,8 @@ if (!empty($tests)) {
         // Read from jUnit XML to find assertions, failures, errors and stacktraces
         if (file_exists($file_log_junit2)) {
             analyzeJunitXmlFileAndAddToResult($file_log_junit2, $testresult);
-        } else {
+        }
+        else {
             $testresult->setNumberOfAssertions(0);
             $testresult->setNumberOfFailure(0);
             $testresult->setNumberOfErrors(0);
@@ -463,7 +463,8 @@ if (!empty($tests)) {
             }
             // See if this line contains a screenshot
             // Example: Screenshot: http://mydomain.com/randomhexadecimal1235af33aa4af.png
-            preg_match('#Screenshot: .+\/([a-f0-9]+\.png)#', $ob_line, $screenshot);
+            echo '#################### '.$ob_line.chr(10);
+            preg_match('/Screenshot: ([\/A-Z\_a-z0-9]*\.png)/', $ob_line, $screenshot);
             // ?: Screenshot URL
             if (isset($screenshot[1]) && isset($screenshot_url)) {
                 $screenshotFilename = $screenshot[1];

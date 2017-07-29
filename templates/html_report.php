@@ -13,7 +13,7 @@
         Selenium test at <?=$result->getBaseUrl() ?> from <?=$result->getTestsDirectory() ?> started
         at <?=date('D M j H:i:s Y', $result->getTimeStart()) ?>
     </title>
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="fancybox/jquery.fancybox-1.3.4.pack.js"></script>
     <link rel="stylesheet" type="text/css" href="fancybox/jquery.fancybox-1.3.4.css" media="screen"/>
     <script>
@@ -72,6 +72,7 @@ foreach($result->getTests() as $testcase) {
         $stacktrace = $stacktrace . '<br/>####################################################<br/>## <b>FAILURE:</b> ' .
             $failure->getType() . '<br/>####################################################<br/>' . auto_link_text( $stackstring );
     }
+    $stacktrace .= htmlify($testcase->getSystemOut());
 
 
     // Generate line numbers to use next to source code for easy to find failures and errors

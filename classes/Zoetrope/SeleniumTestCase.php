@@ -119,7 +119,7 @@ class SeleniumTestCase_Selenium1Wrapper extends PHPUnit_Extensions_Selenium2Test
 
     public function isChecked($locator) {
         return $this->getCssSelectorFromSelenium1Stuff($locator)
-            ->attribute('checked') == 'checked';
+            ->attribute('checked') == 'checked' || $this->getCssSelectorFromSelenium1Stuff($locator)->selected();
     }
 
     public function getAttribute($locator, $attribute_name) {
@@ -155,6 +155,9 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
     // TODO: why is this public?
 
     public $selenium_timeout;
+    public $captureScreenshotOnFailure;
+    public $screenshotUrl;
+    public $screenshotPath;
 
     protected function setUp() {
         global $selenium_server_host, $selenium_server_port, $target_browser, $target_url, $codecoverage_url, $test_file, $screenshot_url;
@@ -167,7 +170,7 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
             $selenium_server_port = 4444;
         }
         if(!isset($target_browser)) {
-            $target_browser = '*chrome';
+            $target_browser = 'chrome';
         }
         if(!isset($target_url)) {
             $target_url = 'http://targeturl.notset.example.com/';
@@ -199,7 +202,7 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
         $filepath = $this->screenshotPath . '/' . $this->getTestId() . '.png';
         $screenshot = $this->currentScreenshot();
         file_put_contents($filepath, $screenshot);
-        echo 'Screenshot of "' . $descriptionOfScreenshot . '": ' . $filepath . PHP_EOL;
+        echo 'Screenshot: ' . $this->getTestId() . '.png' . PHP_EOL;
     }
 
 
@@ -331,7 +334,7 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
 
     public function waitForText ($locator, $pattern, $description = null) {
         for ($second = 0; ; $second++) {
-            if ($second >= 60) {
+            if ($second >= 10) {
                 if (!is_null($description)) {
                     $this->fail($description);
                 }
@@ -348,7 +351,7 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
 
     public function waitForTextPresent ($pattern, $description = null) {
         for ($second = 0; ; $second++) {
-            if ($second >= 60) {
+            if ($second >= 10) {
                 if(!is_null($description)) {
                     $this->fail($description);
                 }
@@ -363,18 +366,15 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
         }
     }
 
-    public function waitForElementPresent($locator, $description = null) {
+    public function waitForElementPresent($locator) {
         for ($second = 0; ; $second++) {
-            if ($second >= 60) {
-                if(!is_null($description)) {
-                    $this->fail($description);
-                }
-                else {
-                    $this->fail('Timeout waiting for element "' . $locator . '"');
-                }
+            if ($second >= 10) {
+                $this->fail('Timeout waiting for element "' . $locator . '"');
             }
             try {
-                if ($this->isElementPresent($locator)) break;
+                if ($this->isElementPresent($locator)) {
+                    break;
+                }
             } catch (Exception $e) {}
             sleep(1);
         }
@@ -382,7 +382,7 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
 
     public function waitForElementNotPresent($locator, $description = null) {
         $second = 0;
-        while ($this->isElementPresent($locator) && $second < 60) {
+        while ($this->isElementPresent($locator) && $second < 10) {
             sleep(1);
             $second++;
         }
@@ -441,6 +441,9 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
     }
 
     public function onNotSuccessfulTest($e) {
+        if ($this->captureScreenshotOnFailure) {
+            $this->captureScreenshotOf('');
+        }
 
         // Sleep for 10 seconds to keep the window open when recording and keep the browser open when running locally
         // This ensures that the video will contain some seconds of the actual failure scenario - the last frame.

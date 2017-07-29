@@ -23,9 +23,9 @@ abstract class BackgroundService
 
         // If shellscript, pass pid-file as last argument to command
         if ($shellscript) {
-            exec(sprintf("%s \"%s\" > \"%s\" 2>&1", $command, $this->pid_file_name, $this->output_file_name));
+            exec("$command \"".$this->pid_file_name."\" > \"".$this->output_file_name."\" 2>&1");
         } else {
-            exec(sprintf("%s > \"%s\" 2>&1 & echo $! > \"%s\"", $command, $this->output_file_name, $this->pid_file_name));
+            exec("$command > \"".$this->output_file_name."\" 2>&1 & echo $! > \"".$this->pid_file_name."\"");
         }
 
         $remaining_tries = 60;
@@ -146,19 +146,13 @@ class SeleniumBackgroundService extends BackgroundService implements SeleniumSer
 
     public function __construct(XWindowsServiceInterface $display, $port, $log_file)
     {
-        global $selenium_firefox_profile;
-
         $this->port = $port;
         $command =
             'export DISPLAY="' . $display->getDisplay() . '" && ' .
                 'java' .
+                ' -Dwebdriver.chrome.driver=zoetrope/chromedriver-2.30_linux64' .
                 ' -jar ' . str_replace(' ', '\ ', __DIR__ . '/selenium-server-*.jar') .
-                ' -singlewindow' .
                 ' -port ' . $this->port;
-
-        if(!empty($selenium_firefox_profile)) {
-                $command .= ' -firefoxProfileTemplate "' . $selenium_firefox_profile . '"' ;
-        }
 
         $this->startProcess($log_file, $command);
     }
@@ -189,8 +183,6 @@ class SeleniumForegroundService extends BackgroundService implements SeleniumSer
         $this->port = $port;
         $command = 'java' .
             ' -jar ' . str_replace(' ', '\ ', __DIR__ . '/selenium-server-*.jar') .
-            ' -singlewindow' .
-        //    ' -firefoxProfileTemplate "' . __DIR__ . '/ffProfile"' .
             ' -port ' . $this->port;
 
         $this->startProcess($log_file, $command);
@@ -280,7 +272,7 @@ class SeleniumTest
     protected $testFileName;
     protected $testGroup;
 
-    public function __construct(SeleniumServiceInterface $selenium_server, $test_file, $test_group, $base_url, $browser = '*firefox')
+    public function __construct(SeleniumServiceInterface $selenium_server, $test_file, $test_group, $base_url, $browser)
     {
         global $codecoverage_url, $screenshot_url;
         $this->testFileName = $test_file;
@@ -383,7 +375,7 @@ class SeleniumTest
  * @param string $browser Selenium browser
  * @return SeleniumTest[]
  */
-function selenium_get_all_tests($directory, SeleniumServiceInterface $selenium, $test_group, $base_url, $browser = '*firefox')
+function selenium_get_all_tests($directory, SeleniumServiceInterface $selenium, $test_group, $base_url, $browser)
 {
     $tests = array();
 
@@ -626,8 +618,7 @@ function copyAndMoveTestResultsToResultsDirectory($tests_directory, $results_dir
  * @param  string                    $file_log_junit2
  * @param  Zoetrope_Result_Testcase  $testresult
  */
-function analyzeJunitXmlFileAndAddToResult($file_log_junit2, Zoetrope_Result_Testcase $testresult)
-{
+function analyzeJunitXmlFileAndAddToResult($file_log_junit2, Zoetrope_Result_Testcase $testresult) {
     try {
         $xml = simplexml_load_file($file_log_junit2);
         $num_assertions = $xml->xpath('/testsuites/testsuite/@assertions');
@@ -646,6 +637,7 @@ function analyzeJunitXmlFileAndAddToResult($file_log_junit2, Zoetrope_Result_Tes
         // HTML-ify jUnit XML log stacktrace
         $xmlerrorstack = $xml->xpath('/testsuites/testsuite/testcase/error');
         $xmlfailstack = $xml->xpath('/testsuites/testsuite/testcase/failure');
+        $xmlsystemout = $xml->xpath('/testsuites/testsuite/testcase/system-out');
 
         // Find lines that cause errors in the code, for use in linenumber highlighting - also check if build is unstable
         foreach ($xmlerrorstack as $stack) {
@@ -658,12 +650,22 @@ function analyzeJunitXmlFileAndAddToResult($file_log_junit2, Zoetrope_Result_Tes
             if ($unstable && !isset($this_test_unstable)) {
                 // Only unstable if no real failures
                 $this_test_unstable = true;
-            } else if (!$unstable) {
+            }
+            else if (!$unstable) {
                 // A single (real) failure is enough to not be unstable
                 $this_test_unstable = false;
             }
         }
-    } catch (Exception $e) {
+
+        foreach ($xmlfailstack as $stack) {
+            $testresult->addFailure(new Zoetrope_Result_Error('FAILURE - ' . (string)$stack['type'], (string)$stack));
+        }
+
+        foreach ($xmlsystemout as $stack) {
+            $testresult->addSystemOut((string)$stack);
+        }
+    }
+    catch (Exception $e) {
         $testresult->addError(new Zoetrope_Result_Error('XML PARSING FAILED', $e->getMessage()));
 
         $this_test_unstable = false;
