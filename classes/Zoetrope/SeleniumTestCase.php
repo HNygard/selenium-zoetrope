@@ -199,10 +199,20 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
     }
 
     protected function captureScreenshotOf ( $descriptionOfScreenshot ) {
-        $filepath = $this->screenshotPath . '/' . $this->getTestId() . '.png';
+        $screenshotNumber = 0;
+        $filename = substr($this->getTestId(), 0, 50) . '_' . $screenshotNumber++ . '.png';
+        $filepath = $this->screenshotPath . '/' . $filename;
+        while (file_exists($filepath) && $screenshotNumber != 50) {
+            $filename = substr($this->getTestId(), 0, 50) . '_' . $screenshotNumber++ . '.png';
+            $filepath = $this->screenshotPath . '/' . $filename;
+        }
+        if ($screenshotNumber == 50) {
+            throw new Exception('Screenshot already exist [' . $filepath . ']. Logical flaw in Zoetrope_SeleniumTestCase.');
+        }
+
         $screenshot = $this->currentScreenshot();
         file_put_contents($filepath, $screenshot);
-        echo 'Screenshot: ' . $this->getTestId() . '.png' . PHP_EOL;
+        echo 'Screenshot: ' . $filename . PHP_EOL;
     }
 
 
