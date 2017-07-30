@@ -143,6 +143,10 @@ class SeleniumTestCase_Selenium1Wrapper extends PHPUnit_Extensions_Selenium2Test
     public function assertChecked($selector) {
         \PHPUnit\Framework\Assert::assertTrue($this->getCssSelectorFromSelenium1Stuff($selector)->selected());
     }
+
+    public function assertNotChecked($selector) {
+        \PHPUnit\Framework\Assert::assertFalse($this->getCssSelectorFromSelenium1Stuff($selector)->selected());
+    }
 }
 
 /**
@@ -294,6 +298,13 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
     }
     // End temporary solution
 
+    var $waitForVariable;
+    public function setWaitForVariable($i) {
+        $this->waitForVariable = $i;
+    }
+    public function getWaitForVariable() {
+        return $this->waitForVariable;
+    }
 
     /**
      * Temporary workaround to timeout on page loads not working as it should
@@ -359,21 +370,11 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
         }
     }
 
-    public function waitForTextPresent ($pattern, $description = null) {
-        for ($second = 0; ; $second++) {
-            if ($second >= 10) {
-                if(!is_null($description)) {
-                    $this->fail($description);
-                }
-                else {
-                    $this->fail('Timeout waiting for string "' . $pattern . '"');
-                }
-            }
-            try {
-                if ($this->isTextPresent($pattern)) break;
-            } catch (Exception $e) {}
-            sleep(1);
-        }
+    public function waitForTextPresent ($pattern) {
+        $this->setWaitForVariable($pattern);
+        $this->waitUntil(function(Zoetrope_SeleniumTestCase $testCase) {
+            return strpos($this->getText('body'), $testCase->getWaitForVariable()) !== FALSE;
+        });
     }
 
     public function waitForElementPresent($locator) {
