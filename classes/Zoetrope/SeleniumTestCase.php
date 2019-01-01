@@ -234,9 +234,16 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
             throw new Exception('Screenshot already exist [' . $filepath . ']. Logical flaw in Zoetrope_SeleniumTestCase.');
         }
 
-        $screenshot = $this->currentScreenshot();
-        file_put_contents($filepath, $screenshot);
-        echo 'Screenshot: ' . $filename . PHP_EOL;
+        try {
+            $screenshot = $this->currentScreenshot();
+            file_put_contents($filepath, $screenshot);
+            echo 'Screenshot: ' . $filename . PHP_EOL;
+        }
+        catch(Exception $e) {
+            echo $e->getMessage() . PHP_EOL;
+            echo $e->getTraceAsString() . PHP_EOL;
+            echo 'Screenshot: Unavilable - See exception.';
+        }
     }
 
 
