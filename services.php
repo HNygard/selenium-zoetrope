@@ -150,7 +150,7 @@ class SeleniumBackgroundService extends BackgroundService implements SeleniumSer
         $command =
             'export DISPLAY="' . $display->getDisplay() . '" && ' .
                 'java' .
-                ' -Dwebdriver.chrome.driver=zoetrope/chromedriver-2.30_linux64' .
+                ' -Dwebdriver.chrome.driver=zoetrope/chromedriver-2.45_linux64' .
                 ' -jar ' . str_replace(' ', '\ ', __DIR__ . '/selenium-server-*.jar') .
                 ' -port ' . $this->port;
 
@@ -182,6 +182,7 @@ class SeleniumForegroundService extends BackgroundService implements SeleniumSer
     {
         $this->port = $port;
         $command = 'java' .
+            ' -Dwebdriver.chrome.driver=zoetrope/chromedriver-2.45_linux64' .
             ' -jar ' . str_replace(' ', '\ ', __DIR__ . '/selenium-server-*.jar') .
             ' -port ' . $this->port;
 

@@ -181,6 +181,7 @@ if (is_null($base_url)) {
 // Check if test directory or file exists, exit if not
 if (!is_dir($tests_directory) && !file_exists($tests_directory)) {
     echo 'FATAL ERROR: Test directory or file does not exist, exiting...' . PHP_EOL;
+    echo 'Test directory .... : ' . $tests_directory . PHP_EOL;
     exit(1);
 }
 

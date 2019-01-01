@@ -186,6 +186,26 @@ class Zoetrope_SeleniumTestCase extends SeleniumTestCase_Selenium1Wrapper {
         $this->setHost($selenium_server_host);
         $this->setPort($selenium_server_port);
         $this->setBrowser($target_browser);
+
+        if ($target_browser == 'chrome') {
+            // https://github.com/giorgiosironi/phpunit-selenium/issues/429
+            $this->setDesiredCapabilities([
+                "goog:chromeOptions" => [
+                    "args"  => [
+                        //"--headless",
+                        "--disable-gpu",
+                    ],
+                    // disable loading images
+                    "prefs" => [
+                        "profile" => [
+                            "managed_default_content_settings" => [
+                                "images" => 2,
+                            ],
+                        ],
+                    ],
+                ],
+            ]);
+        }
         $this->setBrowserUrl($target_url);
 
         // Code coverage from run-selenium
